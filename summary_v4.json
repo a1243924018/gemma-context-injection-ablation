@@ -1,6 +1,7 @@
 {
  "model": "gemma-e4b-agent:latest",
- "rubric": "rubric_v1.json",
+ "rubric": "rubric_v4.json",
+ "engine_any_of_groups": "OR",
  "arms": {
   "A": {
    "n": 8,
