@@ -19,10 +19,10 @@ def judge(ans, rule):
     must = rule.get("must_any") or []
     hit = [t for t in must if t in a]
     ok_obj = bool(hit) if must else True
-    for grp in rule.get("any_of_groups") or []:
-        if not any(t in a for t in grp):
-            ok_obj = False
-            ev.setdefault("missing_any_group", []).append(grp)
+    groups = rule.get("any_of_groups") or []
+    if groups and not any(any(t in a for t in grp) for grp in groups):
+        ok_obj = False
+        ev.setdefault("missing_any_group", ["|".join(g) for g in groups])
     for grp in rule.get("must_all_groups") or []:
         if not any(t in a for t in grp):
             ok_obj = False
@@ -59,7 +59,7 @@ def main():
     with open(os.path.join(BASE, "rescore_v2.jsonl"), "w", encoding="utf-8") as f:
         for rec in out:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-    with open(os.path.join(BASE, "summary_v2.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(BASE, re.sub(r"rubric_(v\d+)\.json", r"summary_\1.json", RUBF)), "w", encoding="utf-8") as f:
         json.dump({"model": rows[0]["model"], "rubric": "rubric_v1.json",
                    "arms": summ, "note": "judged by lexicon rubric; not model self-report"},
                   f, ensure_ascii=False, indent=1)

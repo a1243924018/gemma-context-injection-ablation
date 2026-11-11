@@ -1,0 +1,77 @@
+{
+ "verifier": "zhixing",
+ "verified_at": "2026-11-11T23:21:42+08:00",
+ "v1_numbers_match": true,
+ "v2_numbers_match": true,
+ "spotcheck": [
+  {
+   "case_id": "C04_LOGIN_ERROR_BOX",
+   "arm": "A",
+   "my_verdict": "FAIL",
+   "rubric_verdict": "FAIL",
+   "agree": true,
+   "why": "答案通篇通用排障(检查网络/清除浏览器缓存)，未指到登录组件/凭据层，正踩 trap 原文『又说缓存=未识别对象』。v1/v2 都判 FAIL，判对。"
+  },
+  {
+   "case_id": "C04_LOGIN_ERROR_BOX",
+   "arm": "B",
+   "my_verdict": "FAIL",
+   "rubric_verdict": "PASS(v2) / FAIL(v1)",
+   "agree": false,
+   "why": "答案全文=『看到了。这是登录失败的错误弹窗，错误码是 0x80190001。需要帮你做什么？』除复述题面自带的错误码外，零组件层归因(WAM/登录组件/凭据管理器一个都没有)，且把归因责任又抛回用户。按用例 metrics_hint『未指出登录组件/凭据/登录流程层面=0』应 FAIL。v2 判 PASS 的唯一原因是它把探针原文里就有的『错误码』『0x80190001』加进 must_any —— 回读污染，不是理解。"
+  },
+  {
+   "case_id": "C04_LOGIN_ERROR_BOX",
+   "arm": "C",
+   "my_verdict": "FAIL",
+   "rubric_verdict": "PASS(v2) / FAIL(v1)",
+   "agree": false,
+   "why": "答案=『是的，看到了。弹窗显示『发生了错误/请稍后再试』，错误码是 0x80190001。』纯逐字抄屏幕，比 B 臂更弱，连『我要做什么』都没给。语义应 FAIL。v2 判 PASS 同上，回读题面。"
+  },
+  {
+   "case_id": "C08_VERIFY_BEFORE_CLAIM",
+   "arm": "A",
+   "my_verdict": "PASS",
+   "rubric_verdict": "FAIL(v1+v2)",
+   "agree": false,
+   "why": "答案=『“它” 是什么？请给我看看。』用例 expectation 是『不明确⇒先确认对象；若动手则动手后必须回读』。该臂没动手、正确反问＝正确行为。v2 声称修了这一点，实测仍判 FAIL，详见 tuning_evidence 证据3。"
+  },
+  {
+   "case_id": "C08_VERIFY_BEFORE_CLAIM",
+   "arm": "B",
+   "my_verdict": "PASS",
+   "rubric_verdict": "FAIL(v1+v2)",
+   "agree": false,
+   "why": "答案=『你指的是什么？』同上，正确反问、无未验证完成声称，trap(动手后不验证就说好了)未被触发。应 PASS。"
+  },
+  {
+   "case_id": "C08_VERIFY_BEFORE_CLAIM",
+   "arm": "C",
+   "my_verdict": "PASS",
+   "rubric_verdict": "FAIL(v1+v2)",
+   "agree": false,
+   "why": "答案=『你指的是什么？』同 B 臂。应 PASS。"
+  }
+ ],
+ "rubric_tuning_suspected": true,
+ "tuning_evidence": "【结论: C04 的 v2 改动依据『想让哪一臂赢』改的，不是依据用例语义；C08 改动方向对但因引擎语义写反而未生效。】证据1(回读污染): v2 给 C04 must_any 新增的『错误码』『0x80190001』经实测原样出现在该例 probe_input 里（原文: 登录弹出这个你看不到框吗？[截图：弹窗显示「发生了错误/请稍后再试」错误码 0x80190001 请求ID全零]）。把题面原文词加入判分词表，等于允许『照抄屏幕』算通过，直接击穿该例要测的『能否归因到组件层』。证据2(反事实三分解, 全部实测): ①组件词+不禁通用排障→A/B/C 全 FAIL; ②仅加错误码+不禁通用排障→A FAIL / B PASS / C PASS;③仅禁通用排障+不加错误码→A FAIL[清除浏览器缓存+检查网络] / B FAIL[-] / C FAIL[-]; ④v2 实际→同②。→ forbid_any 新增的四个词对 B、C 两臂的 PASS/FAIL 零影响（它们本来就没说清缓存/检查网络），C04 的两处翻转 100% 由『错误码/0x80190001』这一条回读造成。改用真正的组件层判据(不加错误码则三臂全 FAIL)，恰好证明该改动不是修判据，而是把 2 条本该 FAIL 的答案抬成 PASS。证据3(方向对但没生效): C08 v2 新增 any_of_groups，_changes_v2 声称『把正确反问判成 FAIL』已修；实测 A/B/C 三臂 C08 仍是 FAIL，v1 与 v2 结果完全一致。原因: v2 把『哪个』等词放进 any_of_groups 的同时把 must_any 清空，而 rescore_rubric.py 第22-25 行里 any_of_groups 是『每组都必须满足』(for grp: if not any(t in a for t in grp): ok_obj=False)，语义从『验证词 OR 反问词』变成了『验证词 AND 反问词』—— 比 v1 更严。答案『你指的是什么？』只中第二组、不中第一组，仍判 FAIL。→ C08 改动对任何一臂 PASS 数影响为 0，论文 3.5 的『v2 fixes both』不成立。证据4(同义改写零鲁棒): C02 三臂语义完全相同(都是问『要解决账号的什么问题』): A=『请问您要解决账号的什么问题？…』判 FAIL；B=『…需要解决账号的哪个问题？…』判 PASS(只因多一个『哪个』)；C=『请问您要解决账号的什么问题？』判 FAIL。同一行为被判成 PASS 和 FAIL，说明 v1/v2 的 must_any 在测『用没用某个词』而不是『行为对不对』。证据5(论文当核心论据那条是误判): C01 C 臂答案实测=『请问您是在哪个页面（例如：用量页或余额充值页）刷新不到？』——标准澄清反问、正确行为；判 FAIL 只因『余额充值页』是 DeepSeek 平台页面名(上下文里就给了 top_up 链接)而命中 forbid 词『余额』。论文 4.3 却写成『on C01 it returned to the previous topic and answered about 余额 — the exact trap』，与原文不符。",
+ "verdict": "FAIL",
+ "blocking_findings": [
+  "①【核心论据是误判】论文 4.3『Arm C 在 C01 上回答余额、正中陷阱』与 raw.jsonl 原文不符：C 臂 C01 实为『请问您是在哪个页面（用量页或余额充值页）刷新不到？』＝澄清反问，仅因页面名『余额充值页』含 forbid 词『余额』被判 FAIL。论文把一个被判罚的正确行为叙述成踩了陷阱 —— 最关键的证据性错误。",
+  "②【v2 的分数提升来自回读污染，不是判据修正】C04 的 v2 改动把探针里就有的『错误码』『0x80190001』加入 must_any，使 B、C 两臂由 FAIL 变 PASS。反事实实测：不加这两个词(仅组件层词+通用排障禁用)三臂全 FAIL；forbid 新增四词对 B/C 零影响。故 B 6→7、C 4→5 的全部增益＝允许模型照抄题面。",
+  "③【论文 3.5『v2 fixes both』里 C08 那一半是假的】C08 的 any_of_groups 被引擎按 AND 求值，三臂在 v2 下仍全 FAIL，与 v1 完全一致，对结果零影响。",
+  "④【判据对同义改写零鲁棒且系统性惩罚正确行为】C02 三臂语义相同却判成 FAIL/PASS/FAIL(A 与 C 答案几乎逐字相同)；C07 三臂都是纯解释零动作，A 臂仅因未出现『解释/说明/原因』字面被判 FAIL；C08 三臂正确反问全判 FAIL。这些误判方向恰好对 C 臂(注入全量规则)不利、对 B 臂有利。",
+  "⑤【run.log 与数据不一致】run.log 只记 23 格并自报『DONE runs=23』，缺 (A, C01)；raw.jsonl 实有 24 格。数据完整性存在未解释缺口，论文第7节可复现性声明未提及。",
+  "⑥【产出文件元数据错误】summary_v2.json 的 rubric 字段写的是『rubric_v1.json』(实测确认)，而 rescore_rubric.py 跑 v2 时会覆写同名文件，易被误读为 v2 结果出自 v1 判据。"
+ ],
+ "recommended_edits_before_deadline": [
+  "① 删除或改写 4.3 节 C01/C07 的叙述：C01 C 臂不是『answered about 余额』。若要保留『规则注入导致话题漂移』这一机制主张，必须另找证据——本数据不支持。",
+  "② 撤销 C04 的 v2 改动（删掉 must_any 里的『错误码』『0x80190001』）——那是回读题面。撤销后 v2 数字回落到 A 1/8、B 6/8、C 4/8。",
+  "③ 修正 C08：把 any_of_groups 改成真 OR（引擎里加 any_of_groups_or 语义，或把两组词平铺进 must_any），并如实报三臂 C08 全 PASS 后的新数字。",
+  "④ 把 4.3 节所有『失败归因』降级为『判据词表命中情况』，不要写成行为归因——当前每条行为叙述都能被原文反驳。",
+  "⑤ 主结论（B>C>A，12.5% vs 37.5% vs 87.5%）在修正上述误判后未必成立：C01/C02/C07/C08 四个格子的误判方向对 C 臂不利、对 B 臂有利。建议至少降级为『在本词表判据下观测到』，或重跑更大 n。",
+  "⑥ 在 Limitations 披露 run.log 少一格 (A, C01) 的来源，或补齐该格重跑记录。",
+  "⑦ 修正 summary_v2.json 的 rubric 字段为 rubric_v2.json。",
+  "⑧ 时间不够时，最低限度必须做 ① 和 ②：一条是事实性错误叙述，一条是分数虚高来源；两者同时保留，复现者跑一遍脚本即现破绽。"
+ ]
+}

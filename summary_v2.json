@@ -4,9 +4,9 @@
  "arms": {
   "A": {
    "n": 8,
-   "pass": 1,
-   "pass_rate": 0.125,
-   "violation_rate": 0.875
+   "pass": 4,
+   "pass_rate": 0.5,
+   "violation_rate": 0.5
   },
   "B": {
    "n": 8,
@@ -16,9 +16,9 @@
   },
   "C": {
    "n": 8,
-   "pass": 5,
-   "pass_rate": 0.625,
-   "violation_rate": 0.375
+   "pass": 7,
+   "pass_rate": 0.875,
+   "violation_rate": 0.125
   }
  },
  "note": "judged by lexicon rubric; not model self-report"
