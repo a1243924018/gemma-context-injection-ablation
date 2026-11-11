@@ -20,6 +20,8 @@ After repairing the rubric by semantics (not by outcome) and re-scoring the same
 
 **Injection helps; the scoped-versus-full distinction does not survive.** Both injection arms reach 7/8, and the difference between them is one case, which is indistinguishable at n = 8.
 
+An arm-blinded semantic re-reading of the same 24 answers — two non-author readers, raw agreement 91.7% (22/24), Cohen's κ = 0.80 — keeps the direction. Under the conservative rule that a judge disagreement counts as a violation, arm A is 62.5%, B 25%, C 12.5%; counting only consensus items, A is 5/8 = 62.5%, B 1/7 = 14.3%, C 0/7 = 0%. The semantic layer disagrees with the lexicon rubric on just 2 of 24 items, and it agrees that scoping buys nothing over full injection at this scale.
+
 We keep the dead claim in the paper on purpose. The methodological contribution is the **oracle audit**: four rubric versions, each defect documented with a counterexample, a counterfactual test showing which arm each defect moved, and every intermediate number published. An evaluation rubric that nobody attacks is an unexamined instrument — and in our case it was wrong in the direction of the result we wanted.
 
 ---
@@ -124,6 +126,7 @@ An independent reviewer received only `raw.jsonl`, the rubric files, and the jud
 | D4 | Lexicon scoring is **not paraphrase-robust**: C02 answers in arms A and C are semantically near-identical to B but miss the literal keyword 哪个 | C02, v1–v3 | Split near-identical answers across PASS/FAIL | Side-by-side reading of the three stored answers |
 | D5 | A correct **explanation-only** answer was penalised for lacking the literal words 解释/说明 | C07, v1–v3 | Arm A lost a case it should have kept | Reading the stored answer |
 | D6 | `run.log` recorded 23 of 24 cells (the 24th came from an earlier smoke run and was resumed by the harness's idempotent skip) | packaging | None on results; but it undermined the "one command reproduces everything" claim | Reviewer counted lines against `raw.jsonl` |
+| D7 | The judge script wrote a **hard-coded** `rescore_v2.jsonl` and a hard-coded `rubric` metadata field, so any later rubric run collaterally overwrote v2's intermediates: `summary_v2.json` was committed holding v4's numbers (4/7/7) instead of v2's (1/7/5), and no engine reproduces 4/7/7 from rubric v2 | judge script v<4, packaging | None on the paper table; it only broke the "recomputation from shipped files" promise | Independent recomputation of all four versions against the published summaries (`verify_repro.py`) |
 
 Net direction of D1–D5: **every one of them made arm C look worse and/or arm B look better.** That is not a coincidence to be shrugged at; a rubric authored by the experimenter inherits the experimenter's expectations.
 
@@ -148,6 +151,39 @@ We are aware that revising a rubric after seeing a critique is exactly the shape
 
 Lexicon rubrics are cheap, deterministic and inspectable — and they are also a hypothesis about language. On 24 samples, ours produced at least five misjudgements, all biased toward the result we expected. Any paper reporting a rubric-scored agent difference without publishing the rubric *and* an adversarial pass over it is reporting, at best, a measurement of its own word list.
 
+### 4.4 Arm-blinded semantic adjudication (sensitivity analysis, not ground truth)
+
+The audit above attacks the *instrument* with more instrument. A separate check asks whether the rubric agrees with
+readers who see only the answers, never the arm label.
+
+Two non-author readers re-judged all 24 stored answers from a dossier containing the case goal, the trap definition,
+the correct object, the failure condition and the answer — no arm labels, no rubric, no keyword list. Agreement was
+**91.7% raw, Cohen's κ = 0.80** (two disagreements, both on C04, resolved by a third non-author read as FAIL because
+echoing the error code is not component-level attribution).
+
+| Arm | PASS (adjudicated) | Violation rate (adjudicated) | PASS (rubric v4) | PASS (rubric v1) |
+|---|---|---|---|---|
+| A — none | 3/8 | **62.5%** | 4/8 | 1/8 |
+| B — scoped | 6/8 | 25.0% | 7/8 | 6/8 |
+| C — full | 7/8 | **12.5%** | 7/8 | 4/8 |
+
+Lexicon against the adjudicated labels: **v1 is 62.5% accurate** (7 false FAILs, 2 false PASSes), **v4 is 91.7%
+accurate** (0 false FAILs, 2 false PASSes). So v4 is close, and its residual error runs one way — it is slightly
+*lenient*, never strict. Two consequences we state plainly:
+
+- **The surviving claim gets stronger.** Under semantic labels, injection moves violation rate from 62.5% to 12.5%
+  (C) or 25% (B) — a bigger effect than the rubric suggested.
+- **The retracted claim gets weaker still.** Under semantic labels full injection (7/8) is not worse than scoped
+  injection (6/8); the one-case gap is the C04 case, where one scoped answer did name the failure but not its layer.
+
+**What this is not.** Both readers and the adjudicator are language models, not humans; they are independent of the
+rubric but not of the model family that produced the answers. Zhiwei-class reviewers are right to hold that an LLM
+judge cannot substitute for human adjudication. We therefore report this as a *sensitivity analysis on the same 24
+strings* — it shows the direction is not an artifact of the word list, and it does not certify the magnitudes.
+
+Artifacts: `semantic_adjudicated.jsonl` (24 rows, both blind labels + adjudicated label + rubric v1/v4 verdicts) and
+`human_blind_analysis_final.json` (agreement, κ, confusion matrices, arm-level recount).
+
 ---
 
 ## 5. Limitations
@@ -157,6 +193,10 @@ Lexicon rubrics are cheap, deterministic and inspectable — and they are also a
 3. **The rubric remains a lexicon.** v4 fixes the specific defects found; it does not make term matching paraphrase-robust. A second reviewer would likely find more.
 4. **The task set is ours**, drawn from our own operational incidents, so it is biased toward failure modes we happen to have met.
 5. **Latency includes prompt overhead only**, not any downstream agent cost.
+6. **Reproducibility is not validity.** Our judge is deterministic and every published row regenerates from
+   `raw.jsonl`; that proves the measurement can be repeated, not that term matching captures intent. The
+   arm-blinded semantic re-read in §4.4 narrows the gap (κ = 0.80, rubric v4 agrees with 91.7% of adjudicated
+   labels) but is itself model-mediated: human adjudication of the same 24 answers remains the missing piece.
 
 ---
 
@@ -176,7 +216,19 @@ zhixing_paper_verdict.json   the independent reviewer's FAIL verdict, verbatim
 ```
 python3 rescore_rubric.py --rubric=rubric_v4.json     # final numbers
 python3 rescore_rubric.py --rubric=rubric_v1.json     # the retracted ones
+python3 verify_repro.py                               # gate: all four versions must reproduce
 ```
+
+Each rubric file pins the engine semantics it was scored under in `_engine.any_of_groups` (v1/v2: `AND`, i.e. the
+defect D2; v3/v4: `OR`). Without that pin, the v2 row is not reproducible: the shipped judge would score rubric v2
+as 2/8 / 8/8 / 6/8, not the 1/8 / 7/8 / 5/8 the table reports. With it, `verify_repro.py` recomputes all four rows
+from `raw.jsonl` alone and compares them to `summary_v1..v4.json` — 4/4 reproduce, and a perturbed summary makes it
+exit non-zero (non-vacuous control). The script is also `--dry`-safe: it no longer overwrites another version's
+artifacts (defect D7).
+
+**What this does and does not prove.** Matching rows across four rubric versions establishes *implementation
+reproducibility* — same stored string in, same verdict out. It says nothing about whether the lexicon is a valid
+semantic judge; that requires human adjudication of the same 24 answers, which §5.3 leaves open.
 
 Re-running the generations takes ≈7 minutes and is resumable cell-by-cell.
 
