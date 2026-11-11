@@ -1,4 +1,4 @@
-# Auditing the Judge: How an Independent Review Overturned a Threefold Effect in a Small-Model Agent Ablation
+# When the Rubric Changes the Winner: Auditing Intent-Violation Evaluation in Small-Model Agents
 
 **Subtitle:** On a 4B-scale Gemma agent, injection of governance rules cuts critical-intent violations from 50% to 12.5% — while the "scoped beats full" effect we first reported turned out to be three defects in our own scoring rubric.
 
@@ -186,6 +186,24 @@ Artifacts: `semantic_adjudicated.jsonl` (24 rows, both blind labels + adjudicate
 
 ---
 
+## 4.5 Per-item traceability
+
+Aggregate rates hide the thing a reader actually needs to check: whether each verdict, in each rubric version, belongs to a specific stored answer. `TRACEABILITY_24.md` (and `traceability_24.csv`) publishes one row per generation with the four lexicon verdicts, both arm-blinded reader labels, their agreement, the revision reason that moved it, and whether the row entered the final denominator.
+
+The winner transition, recomputed from those rows:
+
+| Rubric | A — no rules | B — scoped | C — full |
+|---|---|---|---|
+| lexicon v1 | 87.5% | 25.0% | 50.0% |
+| lexicon v2 | 87.5% | 12.5% | 37.5% |
+| lexicon v3 | 75.0% | 12.5% | 25.0% |
+| lexicon v4 | 50.0% | 12.5% | 12.5% |
+| arm-blinded semantic consensus | 62.5% | 14.3% | 0.0% |
+
+Read down the B and C columns: the gap between scoped and full injection closes monotonically as rubric defects are removed, and no reader — lexicon or semantics — ever puts full injection behind scoped by anything outside n = 1. Read the A column: it falls from 87.5% to 50–62.5%, which is the only effect that survives every version. The two split items are kept visible rather than silently dropped; under the conservative rule (a split counts as a violation) the semantic arm rates become A 62.5%, B 25%, C 12.5%.
+
+---
+
 ## 5. Limitations
 
 1. **n = 8 cases × 3 arms = 24 generations.** One case moves a rate by 12.5 points. The surviving claim (injection vs none) rests on a four-case difference; the retracted claim rested on one.
@@ -196,7 +214,10 @@ Artifacts: `semantic_adjudicated.jsonl` (24 rows, both blind labels + adjudicate
 6. **Reproducibility is not validity.** Our judge is deterministic and every published row regenerates from
    `raw.jsonl`; that proves the measurement can be repeated, not that term matching captures intent. The
    arm-blinded semantic re-read in §4.4 narrows the gap (κ = 0.80, rubric v4 agrees with 91.7% of adjudicated
-   labels) but is itself model-mediated: human adjudication of the same 24 answers remains the missing piece.
+   labels), but both readers are language models, not humans: their agreement measures reproducibility of a
+   semantic judgement, not ground truth. Human adjudication of the same 24 answers is still the missing piece.
+   The tasks are also operational (config, permissions, destructive actions), not code editing: this paper says
+   nothing about agent behaviour on software-engineering tasks where success is machine-checkable.
 
 ---
 
