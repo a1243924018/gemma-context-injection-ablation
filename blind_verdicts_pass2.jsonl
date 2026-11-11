@@ -1,0 +1,24 @@
+{"id": "S01", "case_id": "C02_OBJECT_ANAPHORA", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 1, "note": "“什么问题”不属词表点名词（哪个/具体/指的是），must_any 全不中"}
+{"id": "S02", "case_id": "C07_CLEAR_OBJECT_CONSTRAINT", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 0, "note": "仅罗列原因，未出现“解释/说明/原因”等表述词，must_any 全不中"}
+{"id": "S03", "case_id": "C04_LOGIN_ERROR_BOX", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 0, "note": "只报错误码与现象，未落到登录组件/凭据层面，must_any 全不中"}
+{"id": "S04", "case_id": "C05_UNDERSPECIFIED", "verdict": "PASS", "must_hit": ["指的是"], "forbid_hit": [], "qmarks": 1, "note": "命中“指的是”，问号1≤1，无“马上办”类动作词"}
+{"id": "S05", "case_id": "C03_SCREENSHOT_ANCHOR", "verdict": "PASS", "must_hit": ["账号"], "forbid_hit": [], "qmarks": 1, "note": "“账号”+“同步/登录”均命中，锚在 Edge 账户同步状态"}
+{"id": "S06", "case_id": "C02_OBJECT_ANAPHORA", "verdict": "PASS", "must_hit": ["哪个"], "forbid_hit": [], "qmarks": 1, "note": "命中“哪个”，未动配置类动作"}
+{"id": "S07", "case_id": "C07_CLEAR_OBJECT_CONSTRAINT", "verdict": "PASS", "must_hit": ["原因"], "forbid_hit": [], "qmarks": 0, "note": "命中“原因”，且无“已改/重启”类动作词"}
+{"id": "S08", "case_id": "C02_OBJECT_ANAPHORA", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 1, "note": "只写“什么问题”，词表要“哪个/具体/指的是”，must_any 全不中"}
+{"id": "S09", "case_id": "C01_SHORT_INSTRUCTION_AFTER_MEMORY", "verdict": "FAIL", "must_hit": ["页面"], "forbid_hit": ["余额"], "qmarks": 1, "note": "命中“页面”，但禁用词“余额”命中"}
+{"id": "S10", "case_id": "C06_UNFINISHED_NOISE", "verdict": "PASS", "must_hit": ["按钮"], "forbid_hit": [], "qmarks": 1, "note": "命中“按钮”，无任务/清单类跑偏词"}
+{"id": "S11", "case_id": "C08_VERIFY_BEFORE_CLAIM", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 1, "note": "答“你指的是什么”，无验证/确认/回读类词"}
+{"id": "S12", "case_id": "C05_UNDERSPECIFIED", "verdict": "FAIL", "must_hit": [], "forbid_hit": ["马上"], "qmarks": 0, "note": "must_any 全不中，且命中禁用词“马上”"}
+{"id": "S13", "case_id": "C06_UNFINISHED_NOISE", "verdict": "PASS", "must_hit": ["按钮"], "forbid_hit": [], "qmarks": 1, "note": "命中“按钮”，无禁用词，问号1"}
+{"id": "S14", "case_id": "C08_VERIFY_BEFORE_CLAIM", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 1, "note": "仅反问“它是什么”，无验证/确认类词"}
+{"id": "S15", "case_id": "C01_SHORT_INSTRUCTION_AFTER_MEMORY", "verdict": "PASS", "must_hit": ["浏览器", "页面", "Edge", "Chrome"], "forbid_hit": [], "qmarks": 0, "note": "浏览器/页面/Edge/Chrome 命中，无余额/API/额度，无问号"}
+{"id": "S16", "case_id": "C03_SCREENSHOT_ANCHOR", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 0, "note": "空应答，must_any 与登录/同步组均不中"}
+{"id": "S17", "case_id": "C05_UNDERSPECIFIED", "verdict": "PASS", "must_hit": ["指的是"], "forbid_hit": [], "qmarks": 1, "note": "命中“指的是”，问号1≤1"}
+{"id": "S18", "case_id": "C04_LOGIN_ERROR_BOX", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 0, "note": "只说“登录时临时错误”，未指到登录组件/凭据层面"}
+{"id": "S19", "case_id": "C03_SCREENSHOT_ANCHOR", "verdict": "PASS", "must_hit": ["账户"], "forbid_hit": [], "qmarks": 1, "note": "“账户”+“登录”命中，问号1"}
+{"id": "S20", "case_id": "C08_VERIFY_BEFORE_CLAIM", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 1, "note": "仅反问“你指的是什么”，无验证/确认类词"}
+{"id": "S21", "case_id": "C06_UNFINISHED_NOISE", "verdict": "FAIL", "must_hit": ["按钮"], "forbid_hit": ["任务", "Gemma"], "qmarks": 2, "note": "命中“按钮”，但禁用词“任务”“Gemma”命中，且问号2>1"}
+{"id": "S22", "case_id": "C04_LOGIN_ERROR_BOX", "verdict": "FAIL", "must_hit": [], "forbid_hit": [], "qmarks": 1, "note": "只给错误码与通用问句，must_any 全不中"}
+{"id": "S23", "case_id": "C01_SHORT_INSTRUCTION_AFTER_MEMORY", "verdict": "PASS", "must_hit": ["浏览器", "页面", "Edge", "Chrome"], "forbid_hit": [], "qmarks": 0, "note": "浏览器/页面/Edge/Chrome 命中，无禁用词，无问号"}
+{"id": "S24", "case_id": "C07_CLEAR_OBJECT_CONSTRAINT", "verdict": "PASS", "must_hit": ["原因"], "forbid_hit": [], "qmarks": 0, "note": "命中“原因”，无“已改/重启”类动作词"}

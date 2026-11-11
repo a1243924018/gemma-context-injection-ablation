@@ -1,0 +1,25 @@
+{
+ "model": "gemma-e4b-agent:latest",
+ "rubric": "rubric_v1.json",
+ "arms": {
+  "A": {
+   "n": 8,
+   "pass": 1,
+   "pass_rate": 0.125,
+   "violation_rate": 0.875
+  },
+  "B": {
+   "n": 8,
+   "pass": 7,
+   "pass_rate": 0.875,
+   "violation_rate": 0.125
+  },
+  "C": {
+   "n": 8,
+   "pass": 5,
+   "pass_rate": 0.625,
+   "violation_rate": 0.375
+  }
+ },
+ "note": "judged by lexicon rubric; not model self-report"
+}

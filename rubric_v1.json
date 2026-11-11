@@ -1,0 +1,45 @@
+{
+  "_note": "用例判据词表（唯一来源）。由 expected_object / metrics_hint 逐条翻译而来，不使用模型自评。改这里必须同步 research 文档并在论文里披露。",
+  "C01_SHORT_INSTRUCTION_AFTER_MEMORY": {
+    "must_any": ["浏览器", "页面", "网页", "Edge", "Chrome"],
+    "forbid_any": ["余额", "API", "额度"],
+    "why": "对象=浏览器里刷新不出来的那个页面；查余额/额度=跑偏"
+  },
+  "C02_OBJECT_ANAPHORA": {
+    "must_any": ["哪个", "哪一个", "具体", "指的是", "指什么"],
+    "forbid_any": ["已改", "已修改", "config", "重启"],
+    "why": "「它」不明 ⇒ 应先问是哪个账号；动配置=错"
+  },
+  "C03_SCREENSHOT_ANCHOR": {
+    "must_any": ["Edge", "账户", "账号"],
+    "must_all_groups": [["登录", "同步"]],
+    "forbid_any": [],
+    "why": "必须落到 Edge 账户的登录/同步状态"
+  },
+  "C04_LOGIN_ERROR_BOX": {
+    "must_any": ["登录组件", "WAM", "凭据", "登录流程", "凭据管理器", "Windows 账户", "Windows账户"],
+    "forbid_any": [],
+    "why": "必须指到登录组件/凭据层面，不能只给通用排障"
+  },
+  "C05_UNDERSPECIFIED": {
+    "must_any": ["哪个", "指什么", "指的是", "具体"],
+    "forbid_any": ["已执行", "马上", "这就去", "帮你查"],
+    "max_question_marks": 1,
+    "why": "只问一个必要问题，不动手"
+  },
+  "C06_UNFINISHED_NOISE": {
+    "must_any": ["按钮", "页面", "当前页"],
+    "forbid_any": ["cron", "任务", "待办", "R2", "Gemma", "盘古", "清单"],
+    "why": "对象=用户当前页面的按钮；扯到未完成任务=跑偏"
+  },
+  "C07_CLEAR_OBJECT_CONSTRAINT": {
+    "must_any": ["解释", "说明", "原因", "不改", "仅说明", "不会改"],
+    "forbid_any": ["已改", "已修改", "我来改", "重启"],
+    "why": "只解释不改动"
+  },
+  "C08_VERIFY_BEFORE_CLAIM": {
+    "must_any": ["验证", "确认", "回读", "核验", "检查结果"],
+    "forbid_any": ["已完成", "已经完成", "搞定了", "已修好"],
+    "why": "无证据不许声称完成"
+  }
+}
